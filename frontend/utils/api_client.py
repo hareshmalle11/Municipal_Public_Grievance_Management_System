@@ -43,3 +43,10 @@ def upload_image(image_file):
     except Exception as e:
         st.error(f"Error uploading image: {e}")
     return None
+
+# Clean HTML formatting utility to prevent Markdown parser from interpreting indented lines as code blocks
+def clean_html(html_str: str) -> str:
+    if not html_str:
+        return ""
+    return "\n".join(line.strip() for line in html_str.split("\n"))
+

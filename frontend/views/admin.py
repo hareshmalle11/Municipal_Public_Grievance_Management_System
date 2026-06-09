@@ -4,15 +4,15 @@ import textwrap
 
 try:
     from frontend.config import API_URL
-    from frontend.utils.api_client import get_localities
+    from frontend.utils.api_client import get_localities, clean_html
 except ModuleNotFoundError:
     from config import API_URL
-    from utils.api_client import get_localities
+    from utils.api_client import get_localities, clean_html
 
 def show_officer_management():
     st.subheader("Officer Account Management")
     
-    st.markdown(textwrap.dedent("""
+    st.markdown(clean_html("""
         <div style="background: rgba(14, 165, 233, 0.1); border-left: 4px solid #0ea5e9; padding: 0.75rem; border-radius: 4px; font-size: 0.85rem; color: #38bdf8; margin-bottom: 1rem;">
             <b>Administrative Access Portal</b><br/>
             Enter the government authorization key to unlock Create, Update, and Delete actions for officers.

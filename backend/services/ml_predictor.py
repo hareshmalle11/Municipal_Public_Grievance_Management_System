@@ -2,14 +2,10 @@ from __future__ import annotations
 
 import json
 import re
-from functools import lru_cache
+import threading
 from pathlib import Path
 
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import tokenizer_from_json
-
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 MODEL_DIR = BASE_DIR / "ml_model"
@@ -30,6 +26,12 @@ class GrievancePredictor:
     def __init__(self) -> None:
         self._validate_artifacts()
 
+        # Import tensorflow and keras dynamically inside init to keep startup instant
+        import tensorflow as tf
+        from tensorflow.keras.preprocessing.sequence import pad_sequences
+        from tensorflow.keras.preprocessing.text import tokenizer_from_json
+
+        self._pad_sequences = pad_sequences
         self.model = tf.keras.models.load_model(MODEL_PATH)
         self.tokenizer = tokenizer_from_json(TOKENIZER_PATH.read_text(encoding="utf-8"))
         self.config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
@@ -50,7 +52,7 @@ class GrievancePredictor:
     def predict(self, complaint_text: str) -> dict[str, float | str]:
         cleaned_text = clean_text(complaint_text)
         sequence = self.tokenizer.texts_to_sequences([cleaned_text])
-        padded_sequence = pad_sequences(
+        padded_sequence = self._pad_sequences(
             sequence,
             maxlen=self.max_length,
             padding="post",
@@ -87,6 +89,40 @@ class GrievancePredictor:
         raise ValueError("Unexpected model prediction output format.")
 
 
-@lru_cache(maxsize=1)
-def get_predictor() -> GrievancePredictor:
-    return GrievancePredictor()
+# Thread-safe background loader
+_predictor: GrievancePredictor | None = None
+_predictor_lock = threading.Lock()
+_loading_thread: threading.Thread | None = None
+_loading_error: str | None = None
+
+
+def _load_model_task() -> None:
+    global _predictor, _loading_error
+    try:
+        print("[ML Service] Starting background ML model initialization...")
+        p = GrievancePredictor()
+        with _predictor_lock:
+            _predictor = p
+            _loading_error = None
+        print("[ML Service] Background ML model initialization completed successfully!")
+    except Exception as e:
+        error_msg = f"Error loading ML model in background: {e}"
+        print(f"[ML Service] {error_msg}")
+        with _predictor_lock:
+            _loading_error = error_msg
+
+
+def start_background_loading() -> None:
+    global _loading_thread
+    with _predictor_lock:
+        if _predictor is not None or _loading_thread is not None:
+            return  # Already loaded or loading in progress
+    _loading_thread = threading.Thread(target=_load_model_task, daemon=True)
+    _loading_thread.start()
+
+
+def get_predictor() -> GrievancePredictor | None:
+    with _predictor_lock:
+        if _loading_error is not None:
+            raise RuntimeError(_loading_error)
+        return _predictor

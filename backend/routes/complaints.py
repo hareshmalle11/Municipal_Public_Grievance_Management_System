@@ -59,8 +59,16 @@ def generate_ticket_number() -> str:
 @router.post("/predict", response_model=ComplaintPrediction)
 def predict_complaint(request: ComplaintPredictRequest) -> ComplaintPrediction:
     try:
-        prediction = get_predictor().predict(request.complaint_text)
+        predictor = get_predictor()
+        if predictor is None:
+            raise HTTPException(
+                status_code=503,
+                detail="ML model is initializing in the background. Please try again in a moment."
+            )
+        prediction = predictor.predict(request.complaint_text)
         return ComplaintPrediction(**prediction)
+    except HTTPException:
+        raise
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:

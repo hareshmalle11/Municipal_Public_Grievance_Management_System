@@ -4,10 +4,10 @@ import textwrap
 
 try:
     from frontend.config import API_URL
-    from frontend.utils.api_client import get_localities
+    from frontend.utils.api_client import get_localities, clean_html
 except ModuleNotFoundError:
     from config import API_URL
-    from utils.api_client import get_localities
+    from utils.api_client import get_localities, clean_html
 
 def handle_logout():
     st.session_state.logged_in = False
@@ -18,7 +18,7 @@ def handle_logout():
 
 def show_sidebar_info():
     # Sidebar Navigation Panel
-    st.sidebar.markdown(textwrap.dedent(f"""
+    st.sidebar.markdown(clean_html(f"""
         <div style="text-align: center; padding: 1rem 0;">
             <h2 style="color: #0ea5e9; margin: 0; font-weight: 700; letter-spacing: -0.5px;">🏛️ Civic Portal</h2>
             <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem;">Municipal Grievance System</p>
@@ -31,7 +31,7 @@ def show_sidebar_info():
         role_label = "Citizen" if st.session_state.user_type == "citizen" else "Municipal Officer"
         name_display = u_data.get("name") or u_data.get("officer_name") or u_data.get("username")
         
-        st.sidebar.markdown(textwrap.dedent(f"""
+        st.sidebar.markdown(clean_html(f"""
             <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.05);">
                 <p style="color: #94a3b8; font-size: 0.8rem; margin: 0; text-transform: uppercase;">Authenticated As</p>
                 <h4 style="color: #ffffff; margin: 0.25rem 0 0.5rem 0; font-weight: 600;">{name_display}</h4>
@@ -63,7 +63,7 @@ def show_auth_portal():
     col1, col2 = st.columns([1, 1], gap="large")
     
     with col1:
-        st.markdown(textwrap.dedent("""
+        st.markdown(clean_html("""
             <div class="custom-card" style="height: 100%;">
                 <div class="card-title">🏛️ Municipal Administration Portal</div>
                 <p style="line-height: 1.6; color: #cbd5e1;">
@@ -181,7 +181,7 @@ def show_auth_portal():
         with auth_mode[3]:
             st.subheader("Register Officer Account")
             
-            st.markdown(textwrap.dedent("""
+            st.markdown(clean_html("""
                 <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 0.75rem; border-radius: 4px; font-size: 0.85rem; color: #f87171; margin-bottom: 1rem;">
                     <b>Government Authorization Required</b><br/>
                     Only authorized municipal staff may create officer accounts.

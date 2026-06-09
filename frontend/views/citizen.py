@@ -4,11 +4,11 @@ import textwrap
 
 try:
     from frontend.config import API_URL
-    from frontend.utils.api_client import parse_and_format_date, get_localities, upload_image
+    from frontend.utils.api_client import parse_and_format_date, get_localities, upload_image, clean_html
     from frontend.components.cards import render_complaint_card, render_ticket_tracker_details
 except ModuleNotFoundError:
     from config import API_URL
-    from utils.api_client import parse_and_format_date, get_localities, upload_image
+    from utils.api_client import parse_and_format_date, get_localities, upload_image, clean_html
     from components.cards import render_complaint_card, render_ticket_tracker_details
 
 def show_citizen_portal():
@@ -77,7 +77,7 @@ def show_citizen_portal():
                 g_info = sub["grievance"]
                 pred = sub["prediction"]
                 
-                st.markdown(textwrap.dedent(f"""
+                st.markdown(clean_html(f"""
                     <div class="custom-card">
                         <div class="card-title" style="color: #34d399;">✅ Grievance Registered</div>
                         <p style="margin: 0.25rem 0;"><b>Ticket Number:</b></p>
@@ -97,7 +97,7 @@ def show_citizen_portal():
                     </div>
                 """), unsafe_allow_html=True)
             else:
-                st.markdown(textwrap.dedent("""
+                st.markdown(clean_html("""
                     <div class="custom-card">
                         <div class="card-title">ℹ️ Submission Receipt</div>
                         <p style="color: #94a3b8;">Submit a complaint on the left to see the municipal classification routing response details in real time.</p>
@@ -221,7 +221,7 @@ def show_citizen_portal():
             track_btn = st.button("Query Progress", width="stretch", type="primary")
             
         with search_col2:
-            st.markdown(textwrap.dedent("""
+            st.markdown(clean_html("""
                 <div style="padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; color: #94a3b8;">
                     Grievance status transitions are updated in real-time by reviewing department officers.
                 </div>
