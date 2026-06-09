@@ -3,7 +3,7 @@ import os
 import streamlit as st
 
 #DEFAULT_API_URL = "https://municipal-public-grievance-management.onrender.com"
-DEFAULT_API_URL = "http://127.0.0.1:8501"
+DEFAULT_API_URL = "http://127.0.0.1:8000"  
 
 
 

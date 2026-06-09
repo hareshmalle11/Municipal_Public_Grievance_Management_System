@@ -11,8 +11,8 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import tokenizer_from_json
 
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-MODEL_DIR = BASE_DIR / "ml-service" / "saved_model"
+BASE_DIR = Path(__file__).resolve().parents[1]
+MODEL_DIR = BASE_DIR / "ml_model"
 MODEL_PATH = MODEL_DIR / "grievance_bilstm_multi_task.keras"
 TOKENIZER_PATH = MODEL_DIR / "tokenizer.json"
 CONFIG_PATH = MODEL_DIR / "training_config.json"

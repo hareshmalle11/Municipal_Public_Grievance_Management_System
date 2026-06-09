@@ -1,0 +1,19 @@
+{
+  "vocab_size": 10000,
+  "max_length": 100,
+  "category_classes": [
+    "Water",
+    "Roads",
+    "Electricity",
+    "Sanitation",
+    "Drainage",
+    "Traffic",
+    "Public Property",
+    "Environment"
+  ],
+  "priority_classes": [
+    "Low",
+    "Medium",
+    "High"
+  ]
+}
